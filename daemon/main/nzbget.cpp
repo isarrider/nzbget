@@ -57,6 +57,7 @@
 #include "YEncode.h"
 #include "ExtensionManager.h"
 #include "SystemInfo.h"
+#include "HealthCheck.h"
 
 #ifdef WIN32
 #include "WinService.h"
@@ -100,6 +101,7 @@ ScriptConfig* g_ScriptConfig;
 CommandScriptLog* g_CommandScriptLog;
 ExtensionManager::Manager* g_ExtensionManager;
 System::SystemInfo* g_SystemInfo;
+HealthCheck::Service* g_HealthCheck;
 
 #ifdef WIN32
 WinConsole* g_WinConsole;
@@ -216,6 +218,7 @@ private:
 	std::unique_ptr<CommandScriptLog> m_commandScriptLog;
 	std::unique_ptr<ExtensionManager::Manager> m_extensionManager;
 	std::unique_ptr<System::SystemInfo> m_systemInfo;
+	std::unique_ptr<HealthCheck::Service> m_healthCheck;
 
 #ifdef WIN32
 	std::unique_ptr<WinConsole> m_winConsole;
@@ -285,6 +288,8 @@ void NZBGet::Init()
 #endif
 
 	BootConfig();
+
+	const auto check = g_HealthCheck->Check();
 
 #ifndef WIN32
 	mode_t uMask = static_cast<mode_t>(m_options->GetUMask());
@@ -431,6 +436,9 @@ void NZBGet::CreateGlobals()
 
 	m_systemInfo = std::make_unique<System::SystemInfo>();
 	g_SystemInfo = m_systemInfo.get();
+
+	m_healthCheck = std::make_unique<HealthCheck::Service>();
+	g_HealthCheck = m_healthCheck.get();
 
 	m_scheduler = std::make_unique<Scheduler>();
 
