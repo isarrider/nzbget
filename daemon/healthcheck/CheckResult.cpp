@@ -20,72 +20,72 @@
 #include "nzbget.h"
 
 #include <iostream>
-#include "Check.h"
+#include "CheckResult.h"
 
 namespace HealthCheck
 {
 	namespace File
 	{
-		Check Exists(const fs::path& path)
+		CheckResult Exists(const fs::path& path)
 		{
 			boost::system::error_code ec;
 			if (!fs::is_regular_file(path, ec))
 			{
-				return Check::Error(path.string() + ": " + ec.message());
+				return CheckResult::Error(path.string() + ": " + ec.message());
 			}
 
-			return Check::Ok();
+			return CheckResult::Ok();
 		}
 
-		Check IsWritable(const fs::path& path)
+		CheckResult IsWritable(const fs::path& path)
 		{
 			std::ofstream file(path.c_str(), std::ios::app);
 			if (!file.is_open())
 			{
-				return Check::Error(path.string() + " is not writeable.");
+				return CheckResult::Error(path.string() + " is not writeable.");
 			}
 
-			return Check::Ok();
+			return CheckResult::Ok();
 		}
 
-		Check IsReadable(const fs::path& path)
+		CheckResult IsReadable(const fs::path& path)
 		{
 			std::ifstream file(path.c_str(), std::ios::app);
 			if (!file.is_open())
 			{
-				return Check::Error(path.string() + " is not readable.");
+				return CheckResult::Error(path.string() + " is not readable.");
 			}
 
-			return Check::Ok();
+			return CheckResult::Ok();
 		}
 	}
 
 	namespace Directory
 	{
-		Check Exists(const fs::path& path)
+		CheckResult Exists(const fs::path& path)
 		{
 			boost::system::error_code ec;
 			if (!fs::is_directory(path, ec))
 			{
-				return Check::Error(path.string() + ": " + ec.message());
+				return CheckResult::Error(path.string() + ": " + ec.message());
 			}
 
-			return Check::Ok();
+			return CheckResult::Ok();
 		}
 
-		Check IsWritable(const fs::path& path)
+		CheckResult IsWritable(const fs::path& path)
 		{
 			const auto filePath = path / "nzbget_write_test.tmp";
 			std::ofstream file(filePath.c_str());
 			if (!file.is_open())
-				return Check::Error(path.string() + " directory is not writable.");
+				return CheckResult::Error(path.string() + " directory is not writable.");
 
 			file << "This file was created to verify if this directory is writable. It should've been automatically deleted. Feel free to delete it.";
 			file.close();
 
 			fs::remove(filePath);
 
-			return Check::Ok();
+			return CheckResult::Ok();
 		}
 	}
 }

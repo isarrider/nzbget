@@ -17,8 +17,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CHECK_H
-#define CHECK_H
+#ifndef CHECK_RESULT_H
+#define CHECK_RESULT_H
 
 #include <string>
 #include <boost/filesystem.hpp>
@@ -29,22 +29,22 @@ namespace HealthCheck
 
 	enum class Result { Ok, Warning, Error };
 
-	class Check final
+	class CheckResult final
 	{
 	public:
-		static Check Ok()
+		static CheckResult Ok()
 		{
-			return Check(Result::Ok, "");
+			return CheckResult(Result::Ok, "");
 		}
 
-		static Check Warning(std::string message)
+		static CheckResult Warning(std::string message)
 		{
-			return Check(Result::Warning, std::move(message));
+			return CheckResult(Result::Warning, std::move(message));
 		}
 
-		static Check Error(std::string message)
+		static CheckResult Error(std::string message)
 		{
-			return Check(Result::Error, std::move(message));
+			return CheckResult(Result::Error, std::move(message));
 		}
 
 		bool IsError() const { return m_result == Result::Error; }
@@ -52,7 +52,7 @@ namespace HealthCheck
 		const std::string& GetMessage() const { return m_message; }
 
 	private:
-		Check(Result result, std::string message)
+		CheckResult(Result result, std::string message)
 			: m_result{ result }
 			, m_message{ std::move(message) }
 		{
@@ -64,15 +64,15 @@ namespace HealthCheck
 
 	namespace File
 	{
-		Check Exists(const fs::path& path);
-		Check IsWritable(const fs::path& path);
-		Check IsReadable(const fs::path& path);
+		CheckResult Exists(const fs::path& path);
+		CheckResult IsWritable(const fs::path& path);
+		CheckResult IsReadable(const fs::path& path);
 	}
 
 	namespace Directory
 	{
-		Check Exists(const fs::path& path);
-		Check IsWritable(const fs::path& path);
+		CheckResult Exists(const fs::path& path);
+		CheckResult IsWritable(const fs::path& path);
 	}
 }
 

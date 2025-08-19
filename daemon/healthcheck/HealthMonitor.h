@@ -17,36 +17,47 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef HEALTH_CHECK_H
-#define HEALTH_CHECK_H
+#ifndef HEALTH_MONITOR_H
+#define HEALTH_MONITOR_H
 
 #include <vector>
 #include <string_view>
 #include <unordered_map>
-#include "Check.h"
+#include "CheckResult.h"
 
 namespace HealthCheck
 {
-	using Checks = std::vector<Check>;
-	using AllChecks = std::unordered_map<std::string_view, Checks>;
+	using Results = std::unordered_map<std::string_view, std::vector<CheckResult>>;
+	using Hints = std::unordered_map<std::string_view, std::vector<std::string>>;
 
-	class Service final
+	struct HealthReport final
 	{
-	public:
-		Service();
-		Service(const Service&) = delete;
-		Service& operator=(const Service&) = delete; 
-		~Service() = default;
-
-		AllChecks Check();
-
-		const AllChecks& GetHealthChecks() const { return m_allChecks; }
-	private:
-		AllChecks CreateAllChecks();
-		AllChecks m_allChecks;
+		Results results;
+		Hints hints;
 	};
 
-	extern Service* g_HealthCheck;
+	class HealthMonitor final
+	{
+	public:
+		HealthMonitor() = default;
+		HealthMonitor(const HealthMonitor&) = delete;
+		HealthMonitor& operator=(const HealthMonitor&) = delete; 
+		~HealthMonitor() = default;
+
+		void RunChecks();
+		const HealthReport& GetReport() const { return m_report; }
+
+	private:
+		Results GetResults() const;
+		Hints GetHints() const;
+
+		HealthReport m_report;
+	};
+
+	std::string ToJson(const HealthMonitor& monitor);
+	std::string ToXml(const HealthMonitor& monitor);
+
+	extern HealthMonitor* g_HealthCheck;
 }
 
 #endif

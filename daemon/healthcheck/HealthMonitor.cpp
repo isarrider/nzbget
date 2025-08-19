@@ -22,22 +22,18 @@
 
 #include <vector>
 #include <unordered_map>
-#include "HealthCheck.h"
+#include "HealthMonitor.h"
 #include "Options.h"
 
 namespace HealthCheck
 {
-	Service::Service()
+	void HealthMonitor::RunChecks()
 	{
-
+		m_report.results = GetResults();
+		m_report.hints = GetHints();
 	}
 
-	AllChecks Service::Check()
-	{
-		return CreateAllChecks();
-	}
-
-	AllChecks Service::CreateAllChecks()
+	Results HealthMonitor::GetResults() const
 	{
 		return
 		{
@@ -114,6 +110,11 @@ namespace HealthCheck
 				}
 			}
 		};
+	}
+
+	Hints HealthMonitor::GetHints() const
+	{
+		return {{}};
 	}
 }
 
