@@ -24,6 +24,8 @@
 #include <unordered_map>
 #include "HealthMonitor.h"
 #include "Options.h"
+#include "Json.h"
+#include "Xml.h"
 
 namespace HealthCheck
 {
@@ -117,12 +119,60 @@ namespace HealthCheck
 		return {{}};
 	}
 
-	std::string ToJson(const HealthMonitor& monitor)
+	Json::JsonValue ToJson(const Results& results)
 	{
-		return "{}";
+		Json::JsonObject json;
+
+		for (const auto& [name, checks] : results)
+		{
+			Json::JsonArray jsonArr;
+
+			for (const auto& check : checks)
+			{
+				jsonArr.push_back(ToJson(check));
+			}
+			
+			json[name] = jsonArr;
+		}
+
+		return json;
 	}
 
-	std::string ToXml(const HealthMonitor& monitor)
+	Json::JsonValue ToJson(const Hints& hints)
+	{
+		Json::JsonObject json;
+
+		for (const auto& [name, hintArr] : hints)
+		{
+			Json::JsonArray jsonArr;
+
+			for (const auto& hint : hintArr)
+			{
+				jsonArr.push_back(Json::JsonValue(hint));
+			}
+			
+			json[name] = jsonArr;
+		}
+
+		return json;
+	}
+
+	std::string ToXml(const Hints& hints)
+	{
+
+	}
+
+	std::string ToJson(const HealthReport& report)
+	{
+		Json::JsonObject json;
+
+		json["Results"] = ToJson(report.results);
+		json["Hints"] = ToJson(report.hints);
+
+		return Json::Serialize(json);
+	}
+
+	std::string ToXml(const HealthReport& report)
 	{
 		return "";
 	}

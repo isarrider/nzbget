@@ -24,6 +24,32 @@
 
 namespace HealthCheck
 {
+	Json::JsonValue ToJson(const CheckResult& result)
+	{
+		Json::JsonObject json;
+		json["Status"] = static_cast<int>(result.GetStatus());
+		json["Message"] = result.GetMessage();
+
+		return json;
+	}
+
+	std::string ToXml(const CheckResult& result)
+	{
+		xmlChar valueName[] = "value"; 
+		xmlChar structName[] = "struct"; 
+		xmlNodePtr rootNode = xmlNewNode(nullptr, valueName);
+		xmlNodePtr structNode = xmlNewNode(nullptr, structName);
+
+		Xml::AddNewNode(structNode, "Status", "i4", std::to_string(static_cast<int>(result.GetStatus())).c_str());
+		Xml::AddNewNode(structNode, "Message", "string", result.GetMessage().c_str());
+
+		std::string str = Xml::Serialize(rootNode);
+
+		xmlFreeNode(rootNode);
+
+		return str;
+	}
+
 	namespace File
 	{
 		CheckResult Exists(const fs::path& path)
@@ -31,7 +57,7 @@ namespace HealthCheck
 			boost::system::error_code ec;
 			if (!fs::is_regular_file(path, ec))
 			{
-				return CheckResult::Error(path.string() + ": " + ec.message());
+				return CheckResult::Error(ec.message());
 			}
 
 			return CheckResult::Ok();
@@ -42,7 +68,7 @@ namespace HealthCheck
 			std::ofstream file(path.c_str(), std::ios::app);
 			if (!file.is_open())
 			{
-				return CheckResult::Error(path.string() + " is not writeable.");
+				return CheckResult::Error("Is not writeable");
 			}
 
 			return CheckResult::Ok();
@@ -53,7 +79,7 @@ namespace HealthCheck
 			std::ifstream file(path.c_str(), std::ios::app);
 			if (!file.is_open())
 			{
-				return CheckResult::Error(path.string() + " is not readable.");
+				return CheckResult::Error("Is not readable");
 			}
 
 			return CheckResult::Ok();
@@ -67,7 +93,7 @@ namespace HealthCheck
 			boost::system::error_code ec;
 			if (!fs::is_directory(path, ec))
 			{
-				return CheckResult::Error(path.string() + ": " + ec.message());
+				return CheckResult::Error(ec.message());
 			}
 
 			return CheckResult::Ok();
@@ -78,7 +104,7 @@ namespace HealthCheck
 			const auto filePath = path / "nzbget_write_test.tmp";
 			std::ofstream file(filePath.c_str());
 			if (!file.is_open())
-				return CheckResult::Error(path.string() + " directory is not writable.");
+				return CheckResult::Error("Is not writable");
 
 			file << "This file was created to verify if this directory is writable. It should've been automatically deleted. Feel free to delete it.";
 			file.close();

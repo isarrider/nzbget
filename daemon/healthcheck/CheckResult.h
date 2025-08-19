@@ -22,45 +22,50 @@
 
 #include <string>
 #include <boost/filesystem.hpp>
+#include "Json.h"
+#include "Xml.h"
 
 namespace HealthCheck
 {
 	namespace fs = boost::filesystem;
 
-	enum class Result { Ok, Warning, Error };
+	enum class Status { Ok, Warning, Error };
 
 	class CheckResult final
 	{
 	public:
 		static CheckResult Ok()
 		{
-			return CheckResult(Result::Ok, "");
+			return CheckResult(Status::Ok, "");
 		}
 
 		static CheckResult Warning(std::string message)
 		{
-			return CheckResult(Result::Warning, std::move(message));
+			return CheckResult(Status::Warning, std::move(message));
 		}
 
 		static CheckResult Error(std::string message)
 		{
-			return CheckResult(Result::Error, std::move(message));
+			return CheckResult(Status::Error, std::move(message));
 		}
 
-		bool IsError() const { return m_result == Result::Error; }
-		Result GetResult() const { return m_result; }
+		bool IsError() const { return m_status == Status::Error; }
+		Status GetStatus() const { return m_status; }
 		const std::string& GetMessage() const { return m_message; }
 
 	private:
-		CheckResult(Result result, std::string message)
-			: m_result{ result }
+		CheckResult(Status status, std::string message)
+			: m_status{ status }
 			, m_message{ std::move(message) }
 		{
 		}
 
-		Result m_result;
+		Status m_status;
 		std::string m_message;
 	};
+
+	Json::JsonValue ToJson(const CheckResult& result);
+	std::string ToXml(const CheckResult& result);
 
 	namespace File
 	{
