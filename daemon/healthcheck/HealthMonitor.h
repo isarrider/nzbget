@@ -56,8 +56,8 @@ namespace HealthCheck
 
 	std::string ToJson(const HealthMonitor& monitor);
 	std::string ToXml(const HealthMonitor& monitor);
-
-	extern HealthMonitor* g_HealthCheck;
 }
+
+extern HealthCheck::HealthMonitor* g_HealthMonitor;
 
 #endif

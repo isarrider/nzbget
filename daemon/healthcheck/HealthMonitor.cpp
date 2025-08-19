@@ -116,6 +116,16 @@ namespace HealthCheck
 	{
 		return {{}};
 	}
+
+	std::string ToJson(const HealthMonitor& monitor)
+	{
+		return "{}";
+	}
+
+	std::string ToXml(const HealthMonitor& monitor)
+	{
+		return "";
+	}
 }
 
 #endif
