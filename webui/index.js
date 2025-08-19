@@ -297,6 +297,7 @@ var Frontend = (new function($)
 		LimitDialog.init();
 		SystemInfo.init();
 		Statistics.init();
+		AppHealth.init();
 
 		DownloadsEditDialog.init();
 		DownloadsMultiDialog.init();

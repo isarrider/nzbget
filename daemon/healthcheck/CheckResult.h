@@ -49,7 +49,6 @@ namespace HealthCheck
 			return CheckResult(Status::Error, std::move(message));
 		}
 
-		bool IsError() const { return m_status == Status::Error; }
 		Status GetStatus() const { return m_status; }
 		const std::string& GetMessage() const { return m_message; }
 
