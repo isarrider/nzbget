@@ -27,12 +27,6 @@ namespace HealthCheck::Specs
 {
 	using namespace Specification;
 
-	class NotEmptySpec : public ISpecification<std::string_view>
-	{
-	public:
-		bool IsSatisfiedBy(std::string_view option) const override;
-	};
-
 	namespace File
 	{
 		class ExistsSpec : public ISpecification<std::string_view>

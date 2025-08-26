@@ -17,19 +17,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function SectionHealth(checks_, sectionName)
+function SectionHealth(options_, sectionName)
 {
 	let name = sectionName;
-	let info = [];
-	let warnings = [];
-	let errors = [];
-	let checks = checks_;
+	let health = {
+		info: [],
+		warnings: [],
+		errors: []
+	}
 
-	init(checks_);
+	let options = {};
 
-	this.getCheck = function(name)
+	init(options_);
+
+	this.getHealth = function()
 	{
-		return checks[name];
+		return health;
+	}
+
+	this.getChecks = function(name)
+	{
+		return options[name];
 	}
 
 	this.getName = function()
@@ -37,33 +45,43 @@ function SectionHealth(checks_, sectionName)
 		return name;
 	}
 
-	this.getInfo = function() 
+	this.getInfo = function(name) 
 	{
-		return info;
+		return options[name].info;
 	}
 
-	this.getWarnings = function() 
+	this.getWarnings = function(name) 
 	{
-		return warnings;
+		return options[name].warnings;
 	}
 
-	this.getErrors = function() 
+	this.getErrors = function(name) 
 	{
-		return errors;
+		return options[name].errors;
 	}
 
-	function init(options)
+	function init(options_)
 	{
-		Object.values(options).forEach(function(check) {
-			if (check.Status === 1)
-			{
-				info.push(check);
-			}
-			else if (check.Status === 2) {
-				warnings.push(check);
-			}
-			else if (check.Status === 3) {
-				errors.push(check);
+		Object.entries(options_).forEach(function([name, checks]) {
+			options[name] = {
+				info: [],
+				warnings: [],
+				errors: []
+			};
+			for (const check of checks) {
+				if (check.Status === "info")
+				{
+					health.info.push(check);
+					options[name].info.push(check);
+				}
+				else if (check.Status === "warning") {
+					health.warnings.push(check);
+					options[name].warnings.push(check);
+				}
+				else if (check.Status === "error") {
+					health.errors.push(check);
+					options[name].errors.push(check);
+				}	
 			}
 		});
 	}
@@ -107,9 +125,10 @@ function HealthReport() {
 		errorsCount = 0;
 
 		Object.values(sections).forEach(function(section) {
-			infoCount += section.getInfo().length;
-			warningsCount += section.getWarnings().length;
-			errorsCount += section.getErrors().length;
+			const health = section.getHealth();
+			infoCount += health.info.length;
+			warningsCount += health.warnings.length;
+			errorsCount += health.errors.length;
 		});
 	}
 }
@@ -155,13 +174,14 @@ const AppHealth = (new function($)
 	{
 		if (!section) return null;
 
+		const health = section.getHealth();
 		const wrapper = $('<span style="margin-left: 5px;">');
 		const $infoBadge = $('<span class="badge" style="margin-left: 3px;"></span>');
 		const $warningsBadge = $('<span class="badge" style="margin-left: 3px;"></span>');
 		const $errorsBadge = $('<span class="badge" style="margin-left: 3px;"></span>');
-		const infoCount = section.getInfo().length;
-		const warningsCount = section.getWarnings().length;
-		const errorsCount = section.getErrors().length;
+		const infoCount = health.info.length;
+		const warningsCount = health.warnings.length;
+		const errorsCount = health.errors.length;
 		toggleBadgeVisibility($infoBadge, infoCount, SEVERITY_STYLE.INFO);
 		toggleBadgeVisibility($warningsBadge, warningsCount, SEVERITY_STYLE.WARNING);
 		toggleBadgeVisibility($errorsBadge, errorsCount, SEVERITY_STYLE.ERROR);
@@ -175,12 +195,12 @@ const AppHealth = (new function($)
 		return healthReport.getSection(name);
 	}
 
-	this.getCheck = function(section, name)
+	this.getChecks = function(section, name)
 	{
 		if (!section)
 			return null;
 
-		return section.getCheck(name);
+		return section.getChecks(name);
 	}
 
 	function redrawGlobalBadges(healthReport)

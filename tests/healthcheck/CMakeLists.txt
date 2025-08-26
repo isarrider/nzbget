@@ -2,6 +2,7 @@ set(HealthCheckTestsSrc
 	main.cpp
 	SpecsTest.cpp
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/HealthMonitor.cpp
+	${CMAKE_SOURCE_DIR}/daemon/healthcheck/Specs.cpp
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/PathSpecs.cpp
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/Check.cpp
 	${CMAKE_SOURCE_DIR}/daemon/main/Options.cpp

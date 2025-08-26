@@ -107,6 +107,7 @@ set(SRC
 
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/HealthMonitor.cpp
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/Check.cpp
+	${CMAKE_SOURCE_DIR}/daemon/healthcheck/Specs.cpp
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/PathSpecs.cpp
 )
 

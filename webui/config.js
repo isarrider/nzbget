@@ -492,7 +492,7 @@ var Options = (new function($)
 				option.value = null;
 				option.sectionId = section.id;
 				option.select = [];
-				option.healthCheck = AppHealth.getCheck(AppHealth.getSection(section.name), option.name);
+				option.healthChecks = AppHealth.getChecks(AppHealth.getSection(section.name), option.name);
 
 				var pstart = firstdescrline.lastIndexOf('(');
 				var pend = firstdescrline.lastIndexOf(')');
@@ -1111,9 +1111,9 @@ var Config = (new function($)
 			html += '<p class="help-block">' + htmldescr + '</p>';
 		}
 
-		if (option.healthCheck)
+		if (option.healthChecks)
 		{
-			html += makeOptionCheckSection(option);
+			html += makeOptionCheckSection(option.healthChecks);
 		}
 
 		html += '</div>';
@@ -1122,30 +1122,18 @@ var Config = (new function($)
 		return html;
 	}
 
-	function makeOptionCheckSection(option)
+	function makeOptionCheckSection(checks)
 	{
-		const check = option.healthCheck;
-		if (check.Status === AppHealth.SEVERITY.OK) return "";
-	
 		let section = '<div class="option__check-section">';
-
-		if (check.Status === AppHealth.SEVERITY.INFO) 
-		{
-			section += '<span class="option-alert alert alert-success"><i class="option-alert__icon material-icon">info</i><span>' + check.Message + '</span></span>';
-		}
-
-		else if (check.Status === AppHealth.SEVERITY.WARNING) 
-		{
-			section += '<span class="option-alert alert alert-warning"><i class="option-alert__icon material-icon">warning</i><span>' + check.Message + '</span></span>';
-		}
-		else if (check.Status === AppHealth.SEVERITY.ERROR)
-		{
-			section += '<span class="option-alert alert alert-error"><i class="option-alert__icon material-icon">error</i><span>' + check.Message + '</span></span>';
-		}
-		else
-		{
-			return "";
-		}
+		checks.errors.forEach(function(err) {
+			section += '<span class="option-alert alert alert-error"><i class="option-alert__icon material-icon">error</i><span>' + err.Message + '</span></span>';
+		});
+		checks.warnings.forEach(function(warn) {
+			section += '<span class="option-alert alert alert-warning"><i class="option-alert__icon material-icon">warning</i><span>' + warn.Message + '</span></span>';
+		});
+		checks.info.forEach(function(info) {
+			section += '<span class="option-alert alert alert-success"><i class="option-alert__icon material-icon">info</i><span>' + info.Message + '</span></span>';
+		});
 
 		section += '</div>';
 

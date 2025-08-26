@@ -24,7 +24,7 @@
 #include "boost/test/unit_test.hpp"
 
 #include <fstream>
-#include "PathSpecs.h"
+#include "HealthCheck.h"
 
 namespace fs = boost::filesystem;
 using namespace HealthCheck::Specs;
@@ -127,6 +127,14 @@ BOOST_FIXTURE_TEST_CASE(FileIsExecutableSpecTest, SpecsFixture)
 
 	BOOST_CHECK(spec.IsSatisfiedBy(m_executableFile.string()));
 	BOOST_CHECK(!spec.IsSatisfiedBy(m_writableFile.string()));
+}
+
+BOOST_FIXTURE_TEST_CASE(EmptyOptionSpecTest, SpecsFixture)
+{
+	EmptyOptionSpec spec;
+
+	BOOST_CHECK(spec.IsSatisfiedBy(""));
+	BOOST_CHECK(!spec.IsSatisfiedBy("not empty"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

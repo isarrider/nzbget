@@ -17,44 +17,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef HEALTH_MONITOR_H
-#define HEALTH_MONITOR_H
+#ifndef SPECS_H
+#define SPECS_H
 
-#include <vector>
 #include <string_view>
-#include <unordered_map>
 #include "Specification.hpp"
-#include "Check.h"
 
-namespace HealthCheck
+namespace HealthCheck::Specs
 {
-	using SectionReport = std::unordered_map<std::string_view, std::vector<Check>>;
+	using namespace Specification;
 
-	struct HealthReport
-	{
-		SectionReport paths;
-	};
-
-	class HealthMonitor final
+	class EmptyOptionSpec : public ISpecification<std::string_view>
 	{
 	public:
-		HealthMonitor() = default;
-		HealthMonitor(const HealthMonitor&) = delete;
-		HealthMonitor& operator=(const HealthMonitor&) = delete;
-		~HealthMonitor() = default;
-
-		void RunChecks();
-		const HealthReport& GetReport() const { return m_report; }
-
-	private:
-		HealthReport CheckUp() const;
-		HealthReport m_report;
+		bool IsSatisfiedBy(std::string_view option) const override;
 	};
-
-	std::string ToJsonStr(const HealthReport& report);
-	std::string ToXmlStr(const HealthReport& report);
 }
-
-extern HealthCheck::HealthMonitor* g_HealthMonitor;
 
 #endif

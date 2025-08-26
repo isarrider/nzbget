@@ -28,11 +28,6 @@ using namespace boost::system;
 
 namespace HealthCheck::Specs
 {
-	bool NotEmptySpec::IsSatisfiedBy(std::string_view option) const
-	{
-		return !option.empty();
-	}
-
 	namespace File
 	{
 		bool ExistsSpec::IsSatisfiedBy(std::string_view option) const

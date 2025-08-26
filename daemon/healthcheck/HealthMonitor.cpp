@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include "HealthMonitor.h"
+#include "HealthCheck.h"
 #include "Options.h"
 #include "Json.h"
 #include "Xml.h"
@@ -37,14 +37,21 @@ namespace HealthCheck
 	HealthReport HealthMonitor::CheckUp() const
 	{
 		HealthReport report;
-		NewsServersReport newsServersReport;
+		SectionReport paths;
 
-		// pathsReport[Options::DESTDIR] = CheckDestDir(g_Options->GetDestDir());
-		// pathsReport[Options::INTERDIR] = CheckInterDir(g_Options->GetInterDir());
-		// pathsReport[Options::NZBDIR] = CheckDestDir(g_Options->GetNzbDir());
-		// pathsReport[Options::CERTSTORE] = CheckCertStore(g_Options->GetCertStore());
+		const auto isEmpty = Specs::EmptyOptionSpec().IsSatisfiedBy(g_Options->GetMainDir());
+		if (isEmpty)
+		{
+			paths[Options::MAINDIR].push_back(Check::Error(std::string(Options::MAINDIR) + " option cannot be empty"));
+		}
+		const auto exists = Specs::Directory::ExistsSpec().IsSatisfiedBy(g_Options->GetMainDir());
+		if (!exists)
+		{
 
-		report.newsServersReport = std::move(newsServersReport);
+			paths[Options::MAINDIR].push_back(Check::Error(std::string(Options::MAINDIR) + " doesn't exist"));
+		}
+
+		report.paths.swap(paths);
 
 
 // 			{
@@ -113,15 +120,19 @@ namespace HealthCheck
 	{
 		Json::JsonObject reportJson;
 		Json::JsonObject pathsJson;
-		Json::JsonObject newsServersJson;
 
-		for (const auto& [name, check] : report.newsServersReport)
+		for (const auto& [name, checks] : report.paths)
 		{
-			pathsJson[name] = ToJson(check[0]);
+			Json::JsonArray arrJson;
+			for (const auto& check : checks)
+			{
+				arrJson.push_back(ToJson(check));
+			}
+
+			pathsJson[name] = std::move(arrJson);
 		}
 
 		reportJson["Paths"] = std::move(pathsJson);
-		reportJson["NewsServers"] = std::move(newsServersJson);
 
 		return Json::serialize(reportJson);
 	}
