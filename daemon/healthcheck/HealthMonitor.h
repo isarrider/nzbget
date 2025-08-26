@@ -23,17 +23,21 @@
 #include <vector>
 #include <string_view>
 #include <unordered_map>
-#include "CheckResult.h"
+#include "Specification.hpp"
+#include "Check.h"
 
 namespace HealthCheck
 {
-	using Results = std::unordered_map<std::string_view, std::vector<CheckResult>>;
-	using Hints = std::unordered_map<std::string_view, std::vector<std::string>>;
+	using CheckFunc = std::function<Check(std::string_view)>;
+	using SectionReport = std::pair<std::string_view, std::vector<Check>>;
+	using NewsServersReport = std::vector<SectionReport>;
 
-	struct HealthReport final
+
+
+	struct HealthReport
 	{
-		Results results;
-		Hints hints;
+		SectionReport pathsReport;
+		NewsServersReport newsServersReport;
 	};
 
 	class HealthMonitor final
@@ -41,25 +45,19 @@ namespace HealthCheck
 	public:
 		HealthMonitor() = default;
 		HealthMonitor(const HealthMonitor&) = delete;
-		HealthMonitor& operator=(const HealthMonitor&) = delete; 
+		HealthMonitor& operator=(const HealthMonitor&) = delete;
 		~HealthMonitor() = default;
 
 		void RunChecks();
 		const HealthReport& GetReport() const { return m_report; }
 
 	private:
-		Results GetResults() const;
-		Hints GetHints() const;
-
+		HealthReport CheckUp() const;
 		HealthReport m_report;
 	};
 
-	Json::JsonValue ToJson(const Results& results);
-	Json::JsonValue ToJson(const Hints& hints);
-	std::string ToXml(const Results& results);
-	std::string ToXml(const Hints& hints);
-	std::string ToJson(const HealthReport& monitor);
-	std::string ToXml(const HealthReport& monitor);
+	std::string ToJsonStr(const HealthReport& report);
+	std::string ToXmlStr(const HealthReport& report);
 }
 
 extern HealthCheck::HealthMonitor* g_HealthMonitor;

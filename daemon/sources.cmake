@@ -106,7 +106,8 @@ set(SRC
 	${CMAKE_SOURCE_DIR}/daemon/system/Network.cpp
 
 	${CMAKE_SOURCE_DIR}/daemon/healthcheck/HealthMonitor.cpp
-	${CMAKE_SOURCE_DIR}/daemon/healthcheck/CheckResult.cpp
+	${CMAKE_SOURCE_DIR}/daemon/healthcheck/Check.cpp
+	${CMAKE_SOURCE_DIR}/daemon/healthcheck/PathSpecs.cpp
 )
 
 set(WIN32_SRC

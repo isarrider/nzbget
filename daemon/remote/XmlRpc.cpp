@@ -1592,8 +1592,8 @@ void StatusXmlCommand::Execute()
 	bool feedActive = g_FeedCoordinator->HasActiveDownloads();
 	int queuedScripts = g_QueueScriptCoordinator->GetQueueSize();
 	const std::string health = IsJson()
-		? HealthCheck::ToJson(g_HealthMonitor->GetReport())
-		: HealthCheck::ToXml(g_HealthMonitor->GetReport());
+		? HealthCheck::ToJsonStr(g_HealthMonitor->GetReport())
+		: HealthCheck::ToXmlStr(g_HealthMonitor->GetReport());
 
 	AppendFmtResponse(IsJson() ? JSON_STATUS_START : XML_STATUS_START,
 		remainingSizeLo, remainingSizeHi, remainingMBytes, forcedSizeLo,

@@ -17,43 +17,52 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CHECK_RESULT_H
-#define CHECK_RESULT_H
+#ifndef CHECK_H
+#define CHECK_H
 
 #include <string>
-#include <boost/filesystem.hpp>
 #include "Json.h"
 #include "Xml.h"
 
 namespace HealthCheck
 {
-	namespace fs = boost::filesystem;
+	enum class Status { Ok, Info, Warning, Error };
 
-	enum class Status { Ok, Warning, Error };
-
-	class CheckResult final
+	class Check final
 	{
 	public:
-		static CheckResult Ok()
+		Check() = default;
+
+		static Check Ok()
 		{
-			return CheckResult(Status::Ok, "");
+			return Check(Status::Ok, "");
 		}
 
-		static CheckResult Warning(std::string message)
+		static Check Info(std::string message)
 		{
-			return CheckResult(Status::Warning, std::move(message));
+			return Check(Status::Info, std::move(message));
 		}
 
-		static CheckResult Error(std::string message)
+		static Check Warning(std::string message)
 		{
-			return CheckResult(Status::Error, std::move(message));
+			return Check(Status::Warning, std::move(message));
 		}
 
-		Status GetStatus() const { return m_status; }
+		static Check Error(std::string message)
+		{
+			return Check(Status::Error, std::move(message));
+		}
+
+		bool IsOk() const { return m_status == Status::Ok; }
+		bool IsInfo() const { return m_status == Status::Info; }
+		bool IsWarning() const { return m_status == Status::Warning; }
+		bool IsError() const { return m_status == Status::Error; }
+
+		const Status GetStatus() const { return m_status; }
 		const std::string& GetMessage() const { return m_message; }
 
 	private:
-		CheckResult(Status status, std::string message)
+		Check(Status status, std::string message)
 			: m_status{ status }
 			, m_message{ std::move(message) }
 		{
@@ -63,21 +72,10 @@ namespace HealthCheck
 		std::string m_message;
 	};
 
-	Json::JsonValue ToJson(const CheckResult& result);
-	std::string ToXml(const CheckResult& result);
+	std::string_view StatusToStr(Status status);
 
-	namespace File
-	{
-		CheckResult Exists(const fs::path& path);
-		CheckResult IsWritable(const fs::path& path);
-		CheckResult IsReadable(const fs::path& path);
-	}
-
-	namespace Directory
-	{
-		CheckResult Exists(const fs::path& path);
-		CheckResult IsWritable(const fs::path& path);
-	}
+	Json::JsonObject ToJson(const Check& check);
+	Xml::XmlNodePtr ToXml(const Check& check);
 }
 
 #endif
