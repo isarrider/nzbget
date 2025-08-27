@@ -27,19 +27,9 @@
 .deps/
 config.h
 config.h.in~
-configure
-configure~
 config.log
 config.status
 Makefile
-Makefile.in
-aclocal.m4
-posix/config.guess
-posix/config.sub
-posix/depcomp
-posix/install-sh
-posix/missing
-posix/compile
 stamp-h1
 autom4te.cache/
 .dirstamp
@@ -77,13 +67,8 @@ ipch/
 
 # NZBGet specific
 nzbget
-build
-!synology/package/SynoBuildConf/build
+code_revision.cpp
 *.temp
 *.pyc
 pytest.ini
 .cache
-/.idea
-docker/downloads
-docker/config
-*.snap
