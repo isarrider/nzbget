@@ -1,0 +1,76 @@
+name: fork x64 build
+
+# Fork-only workflow: builds a static x86_64 Linux binary of any branch.
+# Run it from Actions -> "fork x64 build" -> "Run workflow" and enter the
+# branch to build. The branch itself does not need to contain this file.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch, tag or commit to build'
+        required: true
+        default: 'develop'
+      type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - release
+        - debug
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/nzbgetcom/nzbget-musl-builder:linux-x86_64-1.0
+
+    steps:
+
+    - name: Checkout ${{ inputs.ref }}
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Prepare names
+      id: names
+      env:
+        REF: ${{ inputs.ref }}
+        TYPE: ${{ inputs.type }}
+      run: |
+        echo "BUILD_DATE=$(date '+%Y%m%d')" >> "$GITHUB_ENV"
+        echo "artifact=nzbget-x86_64-${TYPE}-$(printf '%s' "$REF" | tr -c 'A-Za-z0-9._-' '-')" >> "$GITHUB_OUTPUT"
+
+    - name: Cache unpackers and certificates
+      uses: actions/cache@v6
+      with:
+        path: build/dl
+        key: linux-dl-x86_64-${{ hashFiles('platforms/linux/build.sh') }}
+
+    - name: Cache FetchContent dependencies
+      uses: actions/cache@v6
+      with:
+        path: ${{ github.workspace }}/build/ci-linux${{ inputs.type == 'debug' && '-debug' || '' }}-x86_64/deps
+        key: deps-linux-x86_64-${{ inputs.type }}-${{ hashFiles('cmake/*.cmake', 'CMakeLists.txt', 'CMakePresets.json', 'toolchains/linux/linux-musl.cmake') }}
+
+    - name: Build & Package
+      env:
+        TYPE: ${{ inputs.type }}
+      run: bash platforms/linux/build.sh bin x86_64 "$TYPE" testing
+
+    - name: Upload build log on failure
+      uses: actions/upload-artifact@v7
+      if: failure()
+      with:
+        name: ${{ steps.names.outputs.artifact }}-build-log
+        path: build/ci-linux*/*.log
+        retention-days: 5
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ steps.names.outputs.artifact }}
+        path: build/dist/*.tar.gz
+        retention-days: 7
