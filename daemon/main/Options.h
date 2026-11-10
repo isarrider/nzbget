@@ -74,7 +74,6 @@ public:
 	static constexpr std::string_view CERTCHECK = "CertCheck";
 	static constexpr std::string_view AUTHORIZEDIP = "AuthorizedIP";
 	static constexpr std::string_view ARTICLETIMEOUT = "ArticleTimeout";
-	static constexpr std::string_view ARTICLEREADCHUNKSIZE = "ArticleReadChunkSize";
 	static constexpr std::string_view URLTIMEOUT = "UrlTimeout";
 	static constexpr std::string_view REMOTETIMEOUT = "RemoteTimeout";
 	static constexpr std::string_view FLUSHQUEUE = "FlushQueue";
@@ -189,6 +188,7 @@ public:
 	static constexpr std::string_view ACCURATERATE = "AccurateRate";
 	static constexpr std::string_view CREATEBROKENLOG = "CreateBrokenLog";
 	static constexpr std::string_view BROKENLOG = "BrokenLog";
+	static constexpr std::string_view ARTICLEREADCHUNKSIZE = "ArticleReadChunkSize";
 
 	enum EWriteLog
 	{
@@ -414,7 +414,6 @@ public:
 	EMessageTarget GetDebugTarget() const { return m_debugTarget; }
 	EMessageTarget GetDetailTarget() const { return m_detailTarget; }
 	int GetArticleTimeout() const { return m_articleTimeout; }
-	int GetArticleReadChunkSize() const { return m_articleReadChunkSize; }
 	int GetUrlTimeout() const { return m_urlTimeout; }
 	int GetRemoteTimeout() const { return m_remoteTimeout; }
 	bool GetRawArticle() const { return m_rawArticle; }
@@ -603,7 +602,6 @@ private:
 	bool m_nzbLog = false;
 	bool m_systemHealthCheck = true;
 	int m_articleTimeout = 0;
-	int m_articleReadChunkSize = 0;
 	int m_urlTimeout = 0;
 	int m_remoteTimeout = 0;
 	bool m_appendCategoryDir = false;

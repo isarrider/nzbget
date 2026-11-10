@@ -115,7 +115,6 @@ NZBGet docker image bundled with Python 3.11
 In case a linux image or docker image is slower than expected, here are some tips to increase download speed:
 
 1. Increase number of server connections (NEWS-SERVERS -> Connections) - default is 8, and 16 and 32 are worth trying
-2. For slower machines/hosts - increase article read chunk size from 4 to 64 (CONNECTION -> ArticleReadChunkSize). This is new setting available in v23.
 
 # Unrar 7 support
 

@@ -30,7 +30,6 @@ ConnectionValidator::ConnectionValidator(const Options& options) : m_options(opt
 	m_validators.push_back(std::make_unique<ArticleRetriesValidator>(options));
 	m_validators.push_back(std::make_unique<ArticleIntervalValidator>(options));
 	m_validators.push_back(std::make_unique<ArticleTimeoutValidator>(options));
-	m_validators.push_back(std::make_unique<ArticleReadChunkSizeValidator>(options));
 	m_validators.push_back(std::make_unique<UrlRetriesValidator>(options));
 	m_validators.push_back(std::make_unique<UrlIntervalValidator>(options));
 	m_validators.push_back(std::make_unique<UrlTimeoutValidator>(options));
@@ -81,40 +80,6 @@ Status ArticleTimeoutValidator::Validate() const
 			"'" + std::string(Options::ARTICLETIMEOUT) + "' is set to " + std::to_string(val) +
 			" seconds. "
 			"Slow server responses may cause valid connections to be dropped prematurely");
-	}
-
-	return Status::Ok();
-}
-
-Status ArticleReadChunkSizeValidator::Validate() const
-{
-	// Options stores the value in bytes, the thresholds below are in KB.
-	int val = m_options.GetArticleReadChunkSize() / 1024;
-	Status s = CheckPositiveNum(Options::ARTICLEREADCHUNKSIZE, val);
-	if (!s.IsOk()) return s;
-
-	if (val == 0)
-	{
-		return Status::Ok(); // automatic
-	}
-
-	if (val < 16)
-	{
-		return Status::Warning(
-			"'" + std::string(Options::ARTICLEREADCHUNKSIZE) + "' is set to " +
-			std::to_string(val) +
-			" KB. "
-			"Values below 16 KB may reduce download speed on encrypted connections. "
-			"Use 0 to choose the size automatically");
-	}
-
-	if (val > 10240)
-	{
-		return Status::Info(
-			"'" + std::string(Options::ARTICLEREADCHUNKSIZE) + "' is set to " +
-			std::to_string(val) +
-			" KB. "
-			"This buffer is allocated per connection; ensure sufficient system RAM is available");
 	}
 
 	return Status::Ok();

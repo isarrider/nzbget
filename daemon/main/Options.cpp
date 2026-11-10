@@ -315,7 +315,6 @@ void Options::InitDefaults()
 	SetOption(CERTCHECK.data(), "no");
 	SetOption(AUTHORIZEDIP.data(), "");
 	SetOption(ARTICLETIMEOUT.data(), "60");
-	SetOption(ARTICLEREADCHUNKSIZE.data(), "0");
 	SetOption(URLTIMEOUT.data(), "60");
 	SetOption(REMOTETIMEOUT.data(), "90");
 	SetOption(FLUSHQUEUE.data(), "yes");
@@ -622,7 +621,6 @@ void Options::InitOptions()
 
 	m_downloadRate			= ParseIntValue(DOWNLOADRATE.data(), 10) * 1024;
 	m_articleTimeout		= ParseIntValue(ARTICLETIMEOUT.data(), 10);
-	m_articleReadChunkSize  = ParseIntValue(ARTICLEREADCHUNKSIZE.data(), 10) * 1024;
 	m_urlTimeout			= ParseIntValue(URLTIMEOUT.data(), 10);
 	m_remoteTimeout			= ParseIntValue(REMOTETIMEOUT.data(), 10);
 	m_articleRetries		= ParseIntValue(ARTICLERETRIES.data(), 10);
@@ -1613,7 +1611,8 @@ bool Options::ValidateOptionName(const char* optname, const char* optvalue)
 		!strcasecmp(optname, TERMINATETIMEOUT.data()) ||
 		!strcasecmp(optname, ACCURATERATE.data()) ||
 		!strcasecmp(optname, CREATEBROKENLOG.data()) ||
-		!strcasecmp(optname, BROKENLOG.data()))
+		!strcasecmp(optname, BROKENLOG.data()) ||
+		!strcasecmp(optname, ARTICLEREADCHUNKSIZE.data()))
 	{
 		ConfigWarn("Option \"%s\" is obsolete, ignored", optname);
 		return true;

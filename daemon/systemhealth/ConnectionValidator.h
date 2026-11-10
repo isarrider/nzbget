@@ -68,17 +68,6 @@ private:
 	const Options& m_options;
 };
 
-class ArticleReadChunkSizeValidator : public Validator
-{
-public:
-	explicit ArticleReadChunkSizeValidator(const Options& options) : m_options(options) {}
-	std::string_view GetName() const override { return Options::ARTICLEREADCHUNKSIZE; }
-	Status Validate() const override;
-
-private:
-	const Options& m_options;
-};
-
 class UrlRetriesValidator : public Validator
 {
 public:

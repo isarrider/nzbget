@@ -22,27 +22,20 @@
 
 BOOST_AUTO_TEST_SUITE(NNTPTest)
 
-BOOST_AUTO_TEST_CASE(ReadChunkSizeConfiguredTest)
+BOOST_AUTO_TEST_CASE(ReadChunkSizeTest)
 {
-	// An explicitly configured size is used as is, whatever the article size.
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(4 * 1024, 750000), 4 * 1024);
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(1024 * 1024, 100), 1024 * 1024);
-}
-
-BOOST_AUTO_TEST_CASE(ReadChunkSizeAutoTest)
-{
-	const int minSize = ArticleDownloader::AUTO_READ_CHUNK_MIN;
-	const int maxSize = ArticleDownloader::AUTO_READ_CHUNK_MAX;
+	const int minSize = ArticleDownloader::READ_CHUNK_MIN;
+	const int maxSize = ArticleDownloader::READ_CHUNK_MAX;
 
 	// Typical articles are larger than the cap.
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0, 750000), maxSize);
+	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(750000), maxSize);
 	// Small articles get a buffer of their own size...
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0, 100000), 100000);
+	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(100000), 100000);
 	// ...but never less than one TLS record.
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0, 1000), minSize);
+	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(1000), minSize);
 	// Unknown article size.
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0, 0), maxSize);
-	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0, -1), maxSize);
+	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(0), maxSize);
+	BOOST_CHECK_EQUAL(ArticleDownloader::CalcReadChunkSize(-1), maxSize);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

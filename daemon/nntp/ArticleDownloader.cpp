@@ -359,7 +359,7 @@ ArticleDownloader::EStatus ArticleDownloader::Download()
 	status = adRunning;
 	// One extra byte so received data is always null-terminated
 	// (the decoder parses yEnc header lines with string functions).
-	const int chunkSize = CalcReadChunkSize(g_Options->GetArticleReadChunkSize(), m_articleInfo->GetSize());
+	const int chunkSize = CalcReadChunkSize(m_articleInfo->GetSize());
 	CharBuffer lineBuf(chunkSize + 1);
 
 	while (!IsStopped() && !m_decoder.GetEof())
@@ -442,21 +442,16 @@ ArticleDownloader::EStatus ArticleDownloader::Download()
 	return status;
 }
 
-int ArticleDownloader::CalcReadChunkSize(int configuredSize, int articleSize)
+int ArticleDownloader::CalcReadChunkSize(int articleSize)
 {
-	if (configuredSize > 0)
-	{
-		return configuredSize;
-	}
-
-	// Auto: a larger buffer only costs memory, since recv() returns what is
+	// A larger buffer only costs memory, since recv() returns what is
 	// available. Size it to hold a whole article where possible, but keep the
 	// per-connection memory bounded for devices with many connections.
 	if (articleSize <= 0)
 	{
-		articleSize = AUTO_READ_CHUNK_MAX;
+		articleSize = READ_CHUNK_MAX;
 	}
-	return std::clamp(articleSize, AUTO_READ_CHUNK_MIN, AUTO_READ_CHUNK_MAX);
+	return std::clamp(articleSize, READ_CHUNK_MIN, READ_CHUNK_MAX);
 }
 
 ArticleDownloader::EStatus ArticleDownloader::CheckResponse(const char* response, const char* comment)
